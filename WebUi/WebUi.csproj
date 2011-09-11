@@ -107,6 +107,7 @@
     <Compile Include="Controllers\ShowController.cs" />
     <Compile Include="Controllers\WatchListController.cs" />
     <Compile Include="Domain\Source\IShowSource.cs" />
+    <Compile Include="Domain\Source\SearchCacheItem.cs" />
     <Compile Include="Domain\Source\SourceEpisode.cs" />
     <Compile Include="Domain\Source\SourceShow.cs" />
     <Compile Include="Domain\Source\SourceShowInfo.cs" />

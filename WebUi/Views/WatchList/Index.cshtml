@@ -4,39 +4,34 @@
     ViewBag.Title = "WatchList";
 }
 
-<div class="content-primary">
 
-</div>
-<div class="content-primary">
-    <ul data-role="listview">
+<ul data-role="listview">
     <li data-role="list-divider">Search</li>
     <li>
         <form action="@Url.Action("Search", "Show")" method="post">
             <input type="search" name="partialName" id="partialName" value="" />
-            <button type="submit" name="submit" value="submit-value" data-inline="true">Submit</button>
         </form>
     </li>
     <li data-role="list-divider">Available</li>
-    @foreach (var item in Model.Available)
-    {   
-        <li>    
-            <a href="@Url.Action("ShowDialog", "WatchList", new { item.SourceId })" data-rel="dialog">
-                <h3>@Html.DisplayFor(modelItem => item.ShowName) - @Html.DisplayFor(modelItem => item.FormattedEpisodeNo)</h3>
-                <p>@Html.DisplayFor(modelItem => item.FormattedDate) - @Html.DisplayFor(modelItem => item.EpisodeName)</p>
-            </a>
-            <a href="@Url.Action("Watched", "WatchList", new {item.SourceId})" data-role="button">Watched Episode</a>
-        </li>
-    }
-    <li data-role="list-divider">Future</li>
-    @foreach (var item in Model.Future)
-    {   
-        <li>    
-            <a href="@Url.Action("ShowDialog", "WatchList", new { item.SourceId })" data-rel="dialog">
-                <h3>@Html.DisplayFor(modelItem => item.ShowName) - @Html.DisplayFor(modelItem => item.FormattedEpisodeNo)</h3>
-                <p>@Html.DisplayFor(modelItem => item.FormattedDate) - @Html.DisplayFor(modelItem => item.EpisodeName)</p>
-            </a>
-        </li>
-    }       
-    </ul>
-</div>
+@foreach (var item in Model.Available)
+{   
+    <li>    
+        <a href="@Url.Action("ShowDialog", "WatchList", new { item.SourceId })" data-rel="dialog">
+            <h3>@Html.DisplayFor(modelItem => item.ShowName) - @Html.DisplayFor(modelItem => item.FormattedEpisodeNo)</h3>
+            <p>@Html.DisplayFor(modelItem => item.FormattedDate) - @Html.DisplayFor(modelItem => item.EpisodeName)</p>
+        </a>
+    </li>
+}
+<li data-role="list-divider">Future</li>
+@foreach (var item in Model.Future)
+{   
+    <li>    
+        <a href="@Url.Action("ShowDialog", "WatchList", new { item.SourceId })" data-rel="dialog">
+            <h3>@Html.DisplayFor(modelItem => item.ShowName) - @Html.DisplayFor(modelItem => item.FormattedEpisodeNo)</h3>
+            <p>@Html.DisplayFor(modelItem => item.FormattedDate) - @Html.DisplayFor(modelItem => item.EpisodeName)</p>
+        </a>
+    </li>
+}       
+</ul>
+
 

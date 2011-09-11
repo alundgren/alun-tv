@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using WebUi.Domain.Source;
 using WebUi.Infrastructure;
 
 namespace TvMvc3.Integration.CouchDb.Source
@@ -38,7 +39,25 @@ namespace TvMvc3.Integration.CouchDb.Source
 
         public IEnumerable<SourceShowInfo> FindByName(string partialName)
         {
-            return _tvRage.FindByName(partialName);
+            var cacheItems = _db.GetCollection<SearchCacheItem>("SearchCacheItems");
+            var query = Query.EQ("PartialName", partialName);
+            var searchHit = cacheItems.Find(query).FirstOrDefault();
+            if (searchHit != null && searchHit.CreationDate > DateTimeOffset.UtcNow.AddDays(-1))
+                return searchHit.Hits;
+
+            var hits = _tvRage.FindByName(partialName).ToList();
+            if (hits.Any())
+            {
+                cacheItems.Remove(query);
+                cacheItems.Insert(
+                    new SearchCacheItem
+                        {
+                            CreationDate = DateTimeOffset.UtcNow,
+                            Hits = hits,
+                            PartialName = partialName
+                        });
+            }
+            return hits;
         }
 
         public SourceEpisode GetFirstEpisodeAfter(string sourceId, int seasonNo, int inSeasonEpisodeNo)
