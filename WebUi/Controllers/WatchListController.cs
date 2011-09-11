@@ -32,15 +32,59 @@ namespace TvMvc3.Controllers
                 return View(new List<WatchListEntryViewModel>());
 
             //TODO: Allow filtering out episodes too far in the future
-            return View(
-                wl
+            var episodes = wl
                 .Shows
                 .Where(x => x.FirstUnwatchedEpisode != null)
-                .OrderBy(x => x.ShowName)
-                .Select(x => new WatchListEntryViewModel(x, x.FirstUnwatchedEpisode)));
+                .OrderBy(x => x.ShowName);
+
+            Func<WatchListShow, bool> isAvailable = 
+                x => 
+                    x.FirstUnwatchedEpisode.AirDate.HasValue 
+                    && x.FirstUnwatchedEpisode.AirDate.Value.Date <= DateTimeOffset.UtcNow.Date;
+
+            var availableEpisodes =
+                episodes
+                    .Where(isAvailable)
+                    .Select(x => new WatchListEntryViewModel(x, x.FirstUnwatchedEpisode))
+                    .ToList();
+
+            var futureEpisodes =
+                episodes
+                    .Where(x => !isAvailable(x))
+                    .Select(x => new WatchListEntryViewModel(x, x.FirstUnwatchedEpisode))
+                    .ToList();
+            return View(new WatchListViewModel {Future = futureEpisodes, Available = availableEpisodes});
         }
 
-        [HttpPost]
+        public ActionResult ShowDialog(string sourceId, IPrincipal principal)
+        {
+            var watchList = _watchListRepository.GetByUserName(principal.Identity.Name);
+            if(watchList == null || watchList.Shows == null)
+                return RedirectToAction("Index");
+
+            var show =
+                watchList
+                    .Shows
+                    .Where(x => x.SourceId.Equals(sourceId))
+                    .SingleOrDefault();
+
+            if (show == null)
+                return RedirectToAction("Index");
+
+            //TODO: add link to wl so we dont have to do a second fetch here
+            var sourceShow = _showSource.GetById(sourceId);
+
+            if (sourceShow == null)
+                return RedirectToAction("Index");
+
+            return View(new ShowDialogViewModel
+            {
+                ShowLink = sourceShow.ExternalInfoUrl,
+                ShowName = show.ShowName,
+                SourceId = show.SourceId
+            });
+        }
+
         public RedirectToRouteResult Watched(string sourceId, IPrincipal principal)
         {
             var result = RedirectToAction("Index");
@@ -68,7 +112,6 @@ namespace TvMvc3.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost]
         public RedirectToRouteResult WatchedSeason(string sourceId, IPrincipal principal)
         {
             var result = RedirectToAction("Index");

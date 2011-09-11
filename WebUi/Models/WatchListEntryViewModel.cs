@@ -52,12 +52,14 @@ namespace WebUi.Models
             }
         }
 
-        public string FormattedAndCompactedName
+        public string ShowName
         {
-            get 
-            {
-                return string.Format("{0} - {1}", _show.ShowName, _episode.EpisodeName);
-            }
+            get { return _show.ShowName; }
+        }
+
+        public string EpisodeName
+        {
+            get { return _episode.EpisodeName; }
         }
     }
 }

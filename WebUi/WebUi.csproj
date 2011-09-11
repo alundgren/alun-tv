@@ -131,7 +131,9 @@
     <Compile Include="Domain\Source\TvRageWrapper.cs" />
     <Compile Include="Models\LogonViewModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
+    <Compile Include="Models\ShowDialogViewModel.cs" />
     <Compile Include="Models\WatchListEntryViewModel.cs" />
+    <Compile Include="Models\WatchListViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +177,9 @@
       <Project>{03444C18-99A3-4A2E-8E3F-C9EA562FDF9B}</Project>
       <Name>TvRage</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\WatchList\ShowDialog.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

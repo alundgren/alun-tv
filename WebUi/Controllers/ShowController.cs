@@ -59,10 +59,10 @@ namespace WebUi.Controllers
         }
 
         [HttpPost]
-        public ViewResult Search(string searchFor)
+        public ViewResult Search(string partialName)
         {
             return View(_showSource
-                .FindByName(searchFor)
+                .FindByName(partialName)
                 .OrderBy(r => r.Name).ToList());
         }
     }
