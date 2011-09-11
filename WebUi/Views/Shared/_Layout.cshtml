@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" media="all" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div class="top">
+    @if (HttpContext.Current.User.Identity.IsAuthenticated)
+    {
+        <!-- NOTE: This is not hidden because the feature is unsecured. It's just to make the ui less confusing -->
+        <div style="float:left">
+            <!-- Get the image button to work using razor syntax -->
+            <form action="/Show/Search" method="post">
+                @Html.TextBox("searchFor")
+                <input type="image" src="@Url.Content("~/Content/Search.png")" alt="Search" style="height:16px;width:16px" />
+            </form>           
+        </div>  
+    }
+        <div style="float:right">
+            @if (HttpContext.Current.User.Identity.IsAuthenticated)
+            {
+                @String.Format("User: {0}", @HttpContext.Current.User.Identity.Name)
+            }                
+        </div>
+    </div>
+    <div class="main">
+        @RenderBody()
+    </div>
+</body>
+</html>

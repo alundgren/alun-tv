@@ -1,0 +1,28 @@
+﻿@using TvMvc3.Integration.CouchDb.Source
+@model IEnumerable<SourceShowInfo>
+
+@{
+    ViewBag.Title = "Search";
+}
+
+<table class="searchhits">
+    <tr>
+        <th>
+            @Html.ActionLink("Back", "Index", "WatchList")
+        </th>
+    </tr>
+@foreach (var item in Model) {
+    <tr>
+        <td>
+        <!-- TODO: These should be posts -->
+        @Html.ActionLink(item.Name, "Add", new { externalId = item.SourceId })
+        </td>
+    </tr>
+}
+
+</table>
+
+@if (!Model.Any()) { 
+    @Html.Label("No shows found")
+
+}

@@ -1,0 +1,18 @@
+﻿@model WebUi.Models.LogonViewModel
+
+@{
+    ViewBag.Title = "LogOn";
+}
+
+<h2>Log in</h2>
+<p>
+    Please enter your user name and password. @Html.ActionLink("Register", "Register") if you don't have an account.
+</p>
+@using (Html.BeginForm())
+{ 
+    @Html.ValidationSummary()
+    @Html.EditorForModel()
+    <input type="submit" value="Log in" />
+}
+
+

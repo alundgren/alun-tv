@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A810630E-816A-408C-A1C8-B8EB3EE32BC6}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TvRage", "TvRage\TvRage.fsproj", "{03444C18-99A3-4A2E-8E3F-C9EA562FDF9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebUi", "WebUi\WebUi.csproj", "{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03444C18-99A3-4A2E-8E3F-C9EA562FDF9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03444C18-99A3-4A2E-8E3F-C9EA562FDF9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03444C18-99A3-4A2E-8E3F-C9EA562FDF9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03444C18-99A3-4A2E-8E3F-C9EA562FDF9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
