@@ -97,12 +97,13 @@ namespace WebUi.Controllers
 
         public string Hash(string value, string salt)
         {
+            //http://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage
             var i = salt.IndexOf(';');
             var rounds = int.Parse(salt.Substring(0, i));
             var actualSalt = FromHex(salt.Substring(i + 1));
             var valueBytes = Encoding.UTF8.GetBytes(value);
             using (var b = new Rfc2898DeriveBytes(valueBytes, actualSalt, rounds))
-            {
+            { //http://en.wikipedia.org/wiki/PBKDF2
                 return ToHex(b.GetBytes(24));
             }
         }
