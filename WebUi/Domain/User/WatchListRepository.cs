@@ -52,6 +52,8 @@ namespace TvMvc3.Integration.CouchDb.User
 
         public static WatchListEpisode Map(SourceEpisode source)
         {
+            if (source == null)
+                return null;
             return new WatchListEpisode
             {
                 AirDate = source.AirDate,
