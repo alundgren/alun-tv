@@ -31,11 +31,14 @@ namespace TvMvc3.Controllers
             if (wl == null || wl.Shows == null || wl.Shows.Count == 0)
                 return View(new List<WatchListEntryViewModel>());
 
-            //TODO: Allow filtering out episodes too far in the future
+            //TODO: Allow skipping filtering out episodes too far in the future
             var episodes = wl
                 .Shows
-                .Where(x => x.FirstUnwatchedEpisode != null)
-                .OrderBy(x => x.ShowName);
+                .Where(x => 
+                    x.FirstUnwatchedEpisode != null 
+                    && x.FirstUnwatchedEpisode.AirDate.HasValue 
+                    && x.FirstUnwatchedEpisode.AirDate.Value < DateTimeOffset.UtcNow.AddDays(14))
+                .OrderBy(x => x.FirstUnwatchedEpisode.AirDate.Value);
 
             Func<WatchListShow, bool> isAvailable = 
                 x => 
@@ -84,7 +87,7 @@ namespace TvMvc3.Controllers
                 SourceId = show.SourceId
             });
         }
-
+        
         public RedirectToRouteResult Watched(string sourceId, IPrincipal principal)
         {
             var result = RedirectToAction("Index");
