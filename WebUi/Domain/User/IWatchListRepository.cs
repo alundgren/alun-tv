@@ -8,5 +8,8 @@
     public interface IWatchListRepository
     {
         WatchList GetByUserName(string userName);
+        bool SetSeasonWatched(string userName, string sourceId);
+        bool SetEpisodeWatched(string userName, string sourceId);
+        bool AddShow(string userName, string sourceId);
     }
 }

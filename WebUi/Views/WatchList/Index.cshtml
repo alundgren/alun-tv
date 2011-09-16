@@ -2,36 +2,86 @@
 @model WatchListViewModel
 @{
     ViewBag.Title = "WatchList";
+    Layout = null;
 }
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0b3/jquery.mobile-1.0b3.min.css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/mobile/1.0b3/jquery.mobile-1.0b3.min.js"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/main.js")"></script>
 
+    <script type="text/x-jquery-tmpl" id="showsTemplate">
+        {{each shows}}
+                <li class="show">    
+                    <a href="#showOptionsDialog" data-rel="dialog" id="show${SourceId}">
+                        <input type="hidden" value="${SourceId}" />
+                        <h3>${ShowName} - ${FormattedEpisodeNo}</h3>
+                        <p>${FormattedDate} - ${EpisodeName}</p>
+                    </a>
+                </li>
+        {{/each}}
+    </script>
 
-<ul data-role="listview">
-    <li data-role="list-divider">Search</li>
-    <li>
-        <form action="@Url.Action("Search", "Show")" method="post">
-            <input type="search" name="partialName" id="partialName" value="" />
-        </form>
-    </li>
-    <li data-role="list-divider">Available</li>
-@foreach (var item in Model.Available)
-{   
-    <li>    
-        <a href="@Url.Action("ShowDialog", "WatchList", new { item.SourceId })" data-rel="dialog">
-            <h3>@Html.DisplayFor(modelItem => item.ShowName) - @Html.DisplayFor(modelItem => item.FormattedEpisodeNo)</h3>
-            <p>@Html.DisplayFor(modelItem => item.FormattedDate) - @Html.DisplayFor(modelItem => item.EpisodeName)</p>
-        </a>
-    </li>
-}
-<li data-role="list-divider">Future</li>
-@foreach (var item in Model.Future)
-{   
-    <li>    
-        <a href="@Url.Action("ShowDialog", "WatchList", new { item.SourceId })" data-rel="dialog">
-            <h3>@Html.DisplayFor(modelItem => item.ShowName) - @Html.DisplayFor(modelItem => item.FormattedEpisodeNo)</h3>
-            <p>@Html.DisplayFor(modelItem => item.FormattedDate) - @Html.DisplayFor(modelItem => item.EpisodeName)</p>
-        </a>
-    </li>
-}       
-</ul>
+    <script type="text/x-jquery-tmpl" id="hitsTemplate">
+        {{each hits}}
+            <li class="hit">    
+                <a href="#" data-rel="dialog">
+                    <input type="hidden" value="${SourceId}" />
+                    ${Name}
+                </a>
+            </li>
+        {{/each}}
+    </script>    
+</head>
 
-
+<body>
+    <div id="showsPage" data-role="page">
+        <div data-role="header">
+            <h1>@ViewBag.Title</h1>
+            @if (HttpContext.Current.User.Identity.IsAuthenticated) 
+            {
+            <a href="@Url.Action("LogOut", "Account")" data-icon="back" class="ui-btn-right">Logout @HttpContext.Current.User.Identity.Name </a>
+            }
+        </div>
+        <div data-role="content">
+            <ul id="shows" data-role="listview">
+                <li data-role="list-divider">Search</li>
+                <li>
+                    <form action="#" id="search">
+                        <input type="search" name="partialName" id="partialName" value="" />
+                    </form>                    
+                </li>
+                <li data-role="list-divider" id="availableDivider">Available</li>
+                <li data-role="list-divider" id="futureDivider">Future</li>    
+            </ul>
+        </div>
+    </div>
+    <div id="showOptionsDialog" data-role="page">
+        <div data-role="header">
+            <h1>Options</h1>
+        </div>
+        <div data-role="content">
+            <input type="hidden" id="currentSourceId" value=""/>
+            <a id="back-ref" href="#" data-role="button" data-rel="back">Back</a>
+            <a id="watched-ref" href="#" data-role="button">Watched</a>
+            <a id="watched-season-ref" href="#" data-role="button">Watched Season</a>
+        </div>
+    </div>
+    <div id="searchHitsPage" data-role="page">
+        <div data-role="header">
+            <h1>Search result</h1>
+        </div>
+        <div data-role="content">
+            <ul data-role="listview" id="searchHits">
+                <li><a href="#" id="hitsBack" data-role="button" data-rel="back">Back</a></li>
+                <li data-role="list-divider" id="hitsDivider">Hits</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

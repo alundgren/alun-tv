@@ -16,46 +16,25 @@ namespace WebUi.Controllers
     [Authorize]
     public class ShowController : Controller
     {
-        private readonly IUserRepository _userRepository;
         private readonly IShowSource _showSource;
+        private readonly IWatchListRepository _watchListRepository;
 
-        public ShowController(IUserRepository userRepository, IShowSource showSource)
+        public ShowController(IShowSource showSource, IWatchListRepository watchListRepository)
         {
-            _userRepository = userRepository;
             _showSource = showSource;
+            _watchListRepository = watchListRepository;
         }
 
         public RedirectToRouteResult Add(string externalId, IPrincipal principal)
         {
-            var user = _userRepository.GetByName(principal.Identity.Name);
+            _watchListRepository.AddShow(principal.Identity.Name, externalId);
+            return RedirectToAction("Index", "WatchList");
+        }
 
-            if (user.WatchList == null)
-                user.WatchList = new WatchList();
-            if (user.WatchList.Shows == null)
-                user.WatchList.Shows = new List<WatchListShow>();
-
-            //We already have this show
-            if(user.WatchList.Shows.Any(x => x.SourceId.Equals(externalId)))
-                return RedirectToAction("Index", "WatchList");
-
-            var sourceShow = _showSource.GetById(externalId);
-
-            if(sourceShow == null)
-                return RedirectToAction("Index", "WatchList"); //TODO: Include some sort of error message
-
-            var wl = new WatchListShow
-                         {
-                             SourceId = sourceShow.SourceId,
-                             EndDate = sourceShow.EndDate,
-                             ShowName = sourceShow.Name,
-                             LastWatchedEpisode = null,
-                             FirstUnwatchedEpisode = WatchListRepository.Map(sourceShow.FirstEpisode)
-                         };
-            user.WatchList.Shows.Add(wl);
-
-            _userRepository.UpdateUser(user);
-
-             return RedirectToAction("Index", "WatchList");
+        public ActionResult AddAsync(string sourceId, IPrincipal principal)
+        {
+            return Json(_watchListRepository.AddShow(principal.Identity.Name, sourceId) ? "ok" : "fail",
+                        JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -64,6 +43,13 @@ namespace WebUi.Controllers
             return View(_showSource
                 .FindByName(partialName)
                 .OrderBy(r => r.Name).ToList());
+        }
+
+        public ActionResult SearchAsync(string partialName)
+        {
+            return Json(_showSource
+                            .FindByName(partialName)
+                            .OrderBy(r => r.Name), JsonRequestBehavior.AllowGet);
         }
     }
 }

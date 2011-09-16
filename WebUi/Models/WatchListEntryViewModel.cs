@@ -61,5 +61,14 @@ namespace WebUi.Models
         {
             get { return _episode.EpisodeName; }
         }
+
+        public bool IsAvailable
+        {
+            get
+            {
+                return _episode.AirDate.HasValue
+                       && _episode.AirDate.Value.Date <= DateTimeOffset.UtcNow.Date;
+            }
+        }
     }
 }

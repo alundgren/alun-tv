@@ -73,8 +73,8 @@ namespace WebUi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var isNameTake = _userRepository.GetByName(model.UserName) != null;
-                if (isNameTake)
+                var isNameTaken = _userRepository.GetByName(model.UserName) != null;
+                if (isNameTaken)
                 {
                     ModelState.AddModelError("", "UserName is already in use");
                 }
@@ -140,7 +140,7 @@ namespace WebUi.Controllers
             using (var rng = new RNGCryptoServiceProvider())
             {
                 var bytes = new byte[byteCount];
-                rng.GetBytes(bytes); //Note that this method is threadsafe
+                rng.GetBytes(bytes);
                 return bytes;
             }
         }
