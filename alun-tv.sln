@@ -7,6 +7,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TvRage", "TvRage\TvRage.fsp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebUi", "WebUi\WebUi.csproj", "{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlunTv.Test", "AlunTv.Test\AlunTv.Test.csproj", "{399A87E0-5CC4-405A-8DA7-F430D5DE825F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E63E12C-F256-4BEC-B8BD-223B0E4C9C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{399A87E0-5CC4-405A-8DA7-F430D5DE825F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{399A87E0-5CC4-405A-8DA7-F430D5DE825F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{399A87E0-5CC4-405A-8DA7-F430D5DE825F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{399A87E0-5CC4-405A-8DA7-F430D5DE825F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

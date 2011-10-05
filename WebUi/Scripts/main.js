@@ -51,7 +51,22 @@ function renderShows(availableShows, futureShows) {
         $("#currentSourceId").attr("value", $(this).find("input[type=hidden]").val());
     });
 }
+function initSignalR() {
+    var connection = $.connection('event');
+    connection.received(function (data) { //TODO: Debounce these
+        if(data == "watchlist") {
+            //Watchlist data changed on the server. Refresh if needed
+            if($.mobile.activePage[0].id == "showsPage") {
+                fetchAndRenderShows();
+            }
+        }
+        fetchAndRenderShows();
+    });
+    connection.start();
+    return connection;
+}
 $(document).ready(function () {
+    var connection = initSignalR();
     $("#watched-ref").click(function () {
         var sourceId = $("#currentSourceId").attr("value");
         //TODO; encode sourceId
@@ -78,5 +93,8 @@ $(document).ready(function () {
         searchForShow($("#partialName").val());
         return false;
     });
+
+
+
     fetchAndRenderShows();
 });

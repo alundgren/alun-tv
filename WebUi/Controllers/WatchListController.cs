@@ -5,23 +5,18 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Security.Principal;
-using TvMvc3.Integration.CouchDb.Source;
+using AlunTv.Test;
+using AlunTv.Test.Users.Updater;
 using TvMvc3.Integration.CouchDb.User;
+using WebUi.Controllers;
 using WebUi.Infrastructure;
 using WebUi.Models;
 
 namespace TvMvc3.Controllers
 {
     [Authorize]
-    public class WatchListController : Controller
+    public class WatchListController  : BaseController
     {
-        private readonly IWatchListRepository _watchListRepository;
-
-        public WatchListController(IWatchListRepository watchListRepository)
-        {
-            _watchListRepository = watchListRepository;
-        }
-
         public ActionResult IndexAsync(IPrincipal principal)
         {
             return Json(GetWatchList(principal), JsonRequestBehavior.AllowGet);
@@ -34,12 +29,12 @@ namespace TvMvc3.Controllers
 
         private bool UpdateWatched(string sourceId, IPrincipal principal)
         {
-            return _watchListRepository.SetEpisodeWatched(principal.Identity.Name, sourceId);       
+            return (new UserUpdater(DocumentSession, _ => { })).SetEpisodeWatched(principal.Identity.Name, sourceId);       
         }
 
         private bool UpdateWatchedSeason(string sourceId, IPrincipal principal)
         {
-            return _watchListRepository.SetSeasonWatched(principal.Identity.Name, sourceId);
+            return (new UserUpdater(DocumentSession, _ => { })).SetSeasonWatched(principal.Identity.Name, sourceId);
         }
 
         public ActionResult WatchedAsync(string sourceId, IPrincipal principal)
@@ -53,10 +48,24 @@ namespace TvMvc3.Controllers
                 JsonRequestBehavior.AllowGet);
         }
 
+
+        private User GetUser(string userName)
+        {
+            return
+                DocumentSession.Load<User>(TvMvc3.Integration.CouchDb.User.User.IdFromUserName(userName));
+        }
+
         private WatchListViewModel GetWatchList(IPrincipal principal)
         {
-            var wl = _watchListRepository.GetByUserName(principal.Identity.Name);
-            if (wl == null || wl.Shows == null || wl.Shows.Count == 0)
+            var u = GetUser(principal.Identity.Name);
+            if (u == null)
+                return new WatchListViewModel
+                {
+                    Future = new List<WatchListEntryViewModel>(),
+                    Available = new List<WatchListEntryViewModel>()
+                };
+            var wl = u.WatchList;
+            if (wl == null || wl.Shows == null || wl.Shows.Length == 0)
                 return new WatchListViewModel
                 {
                     Future = new List<WatchListEntryViewModel>(),

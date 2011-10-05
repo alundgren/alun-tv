@@ -5,12 +5,15 @@ using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using AlunTv.Test;
 using Autofac;
 using Autofac.Integration.Mvc;
 using MongoDB.Driver;
-using TvMvc3.Integration.CouchDb;
-using TvMvc3.Integration.CouchDb.Source;
-using TvMvc3.Integration.CouchDb.User;
+using Raven.Client;
+using Raven.Client.Document;
+using Raven.Client.Indexes;
+using SignalR.Routing;
+using WebUi.Domain.Events;
 using WebUi.Models;
 using WebUi.Infrastructure;
 using System.Diagnostics;
@@ -20,44 +23,17 @@ namespace WebUi
 {
     public class MvcApplication : System.Web.HttpApplication
     {
+        public static IDocumentStore DocumentStore;
+        
         private void RegisterAutoFac()
         {
             var builder = new ContainerBuilder();
             builder.RegisterControllers(typeof (MvcApplication).Assembly);
 
-            var appHbMongoUrl = WebConfigurationManager.AppSettings["MONGOHQ_URL"];
-            var db = MongoDatabase.Create(appHbMongoUrl ?? "mongodb://localhost/alun-tv?safe=true");
-            Application["MongoDbAlunTv"] = db;
-            MongoDbInit.MapClasses();
-
-            builder
-                .Register(x => db)
-                .SingleInstance();
-
-            builder
-                .RegisterType<MongoDbUserRepository>()
-                .As<IUserRepository>()
-                .SingleInstance();
-
-            builder
-                .RegisterType<TvRageAndMongoDbShowSource>()
-                .As<IShowSource>()
-                .SingleInstance();
-
-            builder
-                .RegisterType<WatchListRepository>()
-                .As<IWatchListRepository>()
-                .SingleInstance();
-
             builder
                 .RegisterType<DiagnosticsTraceLogger>()
                 .As<ILogger>();
-
-            builder
-                .RegisterType<TvRageWrapper>()
-                .SingleInstance();
-
-            //End module
+            
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
         }
@@ -72,6 +48,8 @@ namespace WebUi
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("elmah.axd");
 
+            RouteTable.Routes.MapConnection<EventConnection>("event", "event/{*operation}");
+
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
@@ -81,11 +59,23 @@ namespace WebUi
 
         protected void Application_Start()
         {
+            InitRavenDb();
+
             ModelBinders.Binders[typeof (IPrincipal)] = new PrincipalModelBinder();
             RegisterAutoFac();
             AreaRegistration.RegisterAllAreas();
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
+        }
+
+        private static void InitRavenDb()
+        {
+            DocumentStore = new DocumentStore
+                                {
+                                    Url = "http://localhost:8081"
+                                }.Initialize();
+            DocumentStore.Conventions.DefaultQueryingConsistency = ConsistencyOptions.QueryYourWrites;
+            IndexCreation.CreateIndexes(typeof (SourceShowInfoCaches_ByName).Assembly, DocumentStore);
         }
 
         protected void Application_Error(object sender, EventArgs e)

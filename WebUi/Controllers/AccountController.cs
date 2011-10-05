@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using AlunTv.Test.Users.Updater;
 using TvMvc3.Integration.CouchDb.User;
 using WebUi.Models;
 using System.Web.Security;
@@ -14,18 +15,17 @@ namespace WebUi.Controllers
 {
     //TODO: Refactor this class to use a membership provider backed by mongodb
     //TODO: Add support for changing passwords
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
-        private readonly IUserRepository _userRepository;
-
-        public AccountController(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
-
         public ActionResult LogOn()
         {
             return View();
+        }
+
+        private User GetUser(string userName)
+        {
+            return
+                DocumentSession.Load<User>(TvMvc3.Integration.CouchDb.User.User.IdFromUserName(userName));
         }
 
         [HttpPost]
@@ -33,7 +33,7 @@ namespace WebUi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = _userRepository.GetByName(model.UserName);
+                var user = GetUser(model.UserName);
                 if (user == null)
                 {
                     ModelState.AddModelError("", "Incorrect username or password");
@@ -46,10 +46,7 @@ namespace WebUi.Controllers
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
                         return Redirect(returnUrl ?? Url.Action("Index", "WatchList"));
                     }
-                    else
-                    {
-                        ModelState.AddModelError("", "Incorrect username or password");
-                    }
+                    ModelState.AddModelError("", "Incorrect username or password");
                 }
             }
 
@@ -73,7 +70,7 @@ namespace WebUi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var isNameTaken = _userRepository.GetByName(model.UserName) != null;
+                var isNameTaken = GetUser(model.UserName) != null;
                 if (isNameTaken)
                 {
                     ModelState.AddModelError("", "UserName is already in use");
@@ -82,7 +79,8 @@ namespace WebUi.Controllers
                 {
                     string salt;
                     var hash = Hash(model.Password, out salt);
-                    var user = _userRepository.CreateUser(model.UserName, hash, salt);
+                    var updater = new UserUpdater(DocumentSession, _ => { });
+                    var user = updater.CreateUser(model.UserName, hash, salt);
                     FormsAuthentication.SetAuthCookie(user.Name, true);
                     return RedirectToAction("Index", "WatchList");
                 }
