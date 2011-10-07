@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
@@ -70,12 +73,39 @@ namespace WebUi
 
         private static void InitRavenDb()
         {
-            DocumentStore = new DocumentStore
-                                {
-                                    Url = "http://localhost:8081"
-                                }.Initialize();
+            var ravenCredentials = WebConfigurationManager.AppSettings["RavenCredentials"]??"";
+            var ravenUrl = WebConfigurationManager.AppSettings["RavenUrl"];
+            if (ravenCredentials == "None")
+            {
+                DocumentStore = new DocumentStore
+                {
+                    Url = ravenUrl,
+                    Credentials = new NetworkCredential("raven", "flyyoufool")
+                }.Initialize();                
+            }
+            else
+            {
+                var c = ravenCredentials.Split(';');
+                SetBypassSslCertificateValidation();
+                DocumentStore = new DocumentStore
+                {
+                    Url = ravenUrl,
+                    Credentials = new NetworkCredential(c[0], c[1])
+                }.Initialize();                  
+            }
             DocumentStore.Conventions.DefaultQueryingConsistency = ConsistencyOptions.QueryYourWrites;
             IndexCreation.CreateIndexes(typeof (SourceShowInfoCaches_ByName).Assembly, DocumentStore);
+        }
+
+        public static void SetBypassSslCertificateValidation()
+        {
+            ServicePointManager.ServerCertificateValidationCallback
+                += BypassSslCertificateValidation;
+        }
+
+        private static bool BypassSslCertificateValidation(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
+        {
+            return true;
         }
 
         protected void Application_Error(object sender, EventArgs e)
