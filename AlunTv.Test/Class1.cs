@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using AlunTv.Test.Users.Updater;
@@ -15,13 +18,12 @@ using Raven.Client.Indexes;
 namespace AlunTv.Test
 {
 
-    [TestFixture]
     public class Tests
     {
-        [Test]
+
         public void TestFullRun()
         {
-            using (var store = new DocumentStore { Url = "http://localhost:8081" }.Initialize())
+            using (var store = new DocumentStore { Url = "http://localhost:8080" }.Initialize())
             {
                 IndexCreation.CreateIndexes(typeof(SourceShowInfoCaches_ByName).Assembly, store);
 
