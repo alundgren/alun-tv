@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -63,7 +64,7 @@ namespace AlunTv.Worker
         static void Main(string[] args)
         {
             const int tenMinutes = 1000*60*10;
-            using (var store = new DocumentStore { Url = "http://localhost:8081" })
+            using (var store = new DocumentStore { Url = ConfigurationManager.AppSettings["RavenUrl"] })
             using (var worker = new Worker(tenMinutes, () => Update(store)))
             {
                 store.Initialize();
@@ -80,8 +81,12 @@ namespace AlunTv.Worker
             {
                 var updater = new ShowUpdater(session, Console.WriteLine); //TODO: Send to signalr
                 updater.UpdateShows();
+                session.SaveChanges();
+            }
+            using (var session = documentStore.OpenSession())
+            {
+                var updater = new ShowUpdater(session, Console.WriteLine); //TODO: Send to signalr
                 updater.UpdateShowNames();
-                //TODO: Update users watchlists
                 session.SaveChanges();
             }
         }

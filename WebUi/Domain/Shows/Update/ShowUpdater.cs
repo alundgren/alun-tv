@@ -36,7 +36,7 @@ namespace AlunTv.Test
             {
                 var originalShow = i.Item1;
                 var updatedShow = i.Item2;
-                _session.Delete(originalShow);
+                _session.Advanced.Evict(originalShow);
                 _session.Store(updatedShow);
             }
             _eventSink("watchlist");
