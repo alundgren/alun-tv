@@ -12,7 +12,6 @@ using Moq;
 using NUnit.Framework;
 using Raven.Client;
 using Raven.Client.Document;
-using Raven.Client.Embedded;
 using Raven.Client.Indexes;
 
 namespace AlunTv.Test

@@ -77,9 +77,6 @@
     <Reference Include="Raven.Client.Debug">
       <HintPath>..\packages\RavenDB.1.0.0.482\lib\net40\Raven.Client.Debug.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Client.Embedded">
-      <HintPath>..\packages\RavenDB-Embedded.1.0.0.482\lib\net40\Raven.Client.Embedded.dll</HintPath>
-    </Reference>
     <Reference Include="Raven.Client.Lightweight">
       <HintPath>..\packages\RavenDB-Embedded.1.0.0.482\lib\net40\Raven.Client.Lightweight.dll</HintPath>
     </Reference>
