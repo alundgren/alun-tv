@@ -44,7 +44,7 @@ namespace WebUi.Controllers
                     if (hashOfEnteredPw.Equals(user.PasswordHash))
                     {
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
-                        return Redirect(returnUrl ?? Url.Action("Index", "WatchList"));
+                        return RedirectToAction("Index", "WatchList");
                     }
                     ModelState.AddModelError("", "Incorrect username or password");
                 }

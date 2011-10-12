@@ -37,6 +37,11 @@ namespace TvMvc3.Controllers
             return (new UserUpdater(DocumentSession, _ => { })).SetSeasonWatched(principal.Identity.Name, sourceId);
         }
 
+        private bool UpdateLastWatchedTo(string sourceId, int seasonNo, int episodeNo, IPrincipal principal)
+        {
+            return (new UserUpdater(DocumentSession, _ => { })).SetLastWatchedTo(principal.Identity.Name, sourceId, seasonNo, episodeNo);
+        }
+
         public ActionResult WatchedAsync(string sourceId, IPrincipal principal)
         {
             return Json(UpdateWatched(sourceId, principal) ? "ok" : "fail", JsonRequestBehavior.AllowGet);
@@ -48,6 +53,10 @@ namespace TvMvc3.Controllers
                 JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult WatchedToAsync(string sourceId, int seasonNo, int episodeno, IPrincipal principal)
+        {
+            return Json(UpdateLastWatchedTo(sourceId, seasonNo, episodeno, principal) ? "ok" : "fail", JsonRequestBehavior.AllowGet);
+        }
 
         private User GetUser(string userName)
         {

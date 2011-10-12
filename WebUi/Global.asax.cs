@@ -12,6 +12,7 @@ using AlunTv.Test;
 using Autofac;
 using Autofac.Integration.Mvc;
 using MongoDB.Driver;
+using NLog;
 using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Indexes;
@@ -27,6 +28,7 @@ namespace WebUi
     public class MvcApplication : System.Web.HttpApplication
     {
         public static IDocumentStore DocumentStore;
+        public static Logger Logger = LogManager.GetCurrentClassLogger();
         
         private void RegisterAutoFac()
         {
@@ -56,7 +58,7 @@ namespace WebUi
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
-                new {controller = "WatchList", action = "Index", id = UrlParameter.Optional} // Parameter defaults
+                new {controller = "Account", action = "LogOn", id = UrlParameter.Optional} // Parameter defaults
                 );
         }
 
@@ -77,24 +79,43 @@ namespace WebUi
             var ravenUrl = WebConfigurationManager.AppSettings["RavenUrl"];
             if (ravenCredentials == "None")
             {
-                DocumentStore = new DocumentStore
-                {
-                    Url = ravenUrl,
-                    Credentials = new NetworkCredential("raven", "flyyoufool")
-                }.Initialize();                
+                InitTestDb(ravenUrl);
             }
             else
             {
-                var c = ravenCredentials.Split(';');
-                SetBypassSslCertificateValidation();
-                DocumentStore = new DocumentStore
-                {
-                    Url = ravenUrl,
-                    Credentials = new NetworkCredential(c[0], c[1])
-                }.Initialize();                  
+                InitProdDb(ravenUrl, ravenCredentials);
             }
             DocumentStore.Conventions.DefaultQueryingConsistency = ConsistencyOptions.QueryYourWrites;
             IndexCreation.CreateIndexes(typeof (SourceShowInfoCaches_ByName).Assembly, DocumentStore);
+        }
+
+        private static void InitProdDb(string ravenUrl, string ravenCredentials)
+        {
+            var c = ravenCredentials.Split(';');
+            SetBypassSslCertificateValidation();
+            DocumentStore = new DocumentStore
+                                {
+                                    Url = ravenUrl,
+                                    Credentials = new NetworkCredential(c[0], c[1])
+                                }.Initialize();
+        }
+
+        private static void InitTestDb(string ravenUrl)
+        {
+            DocumentStore = new DocumentStore
+                                {
+                                    Url = ravenUrl
+                                }.Initialize();
+            using (var session = DocumentStore.OpenSession())
+            {
+                var infoCount = session.Query<ShowInfoCache>().Count();
+                if (infoCount == 0)
+                {
+                    var updater = new ShowUpdater(session, x => Logger.Info("Updated names"));
+                    updater.UpdateShowNames();
+                    session.SaveChanges();
+                }
+            }
         }
 
         public static void SetBypassSslCertificateValidation()

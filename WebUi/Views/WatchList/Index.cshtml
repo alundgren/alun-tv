@@ -9,11 +9,11 @@
 <head>
     <title>@ViewBag.Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0b3/jquery.mobile-1.0b3.min.css" />
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.signalR.min.js")"></script>
     <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/mobile/1.0b3/jquery.mobile-1.0b3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.js"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/main.js")"></script>
 
     <script type="text/x-jquery-tmpl" id="showsTemplate">
@@ -69,8 +69,22 @@
         <div data-role="content">
             <input type="hidden" id="currentSourceId" value=""/>
             <a id="back-ref" href="#" data-role="button" data-rel="back">Back</a>
-            <a id="watched-ref" href="#" data-role="button">Watched</a>
-            <a id="watched-season-ref" href="#" data-role="button">Watched Season</a>
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup">
+    	            <legend>How far have you watched?</legend>
+         	            <input type="radio" name="radio-choice-watched" id="radio-choice-episode" value="choice-episode" checked="checked" />
+         	            <label for="radio-choice-episode">Current episode</label>
+
+         	            <input type="radio" name="radio-choice-watched" id="radio-choice-season" value="choice-season"  />
+         	            <label for="radio-choice-season">Current season</label>
+
+         	            <input type="radio" name="radio-choice-watched" id="radio-choice-custom" value="choice-custom"  />
+         	            <label for="radio-choice-custom">Custom</label>
+                        <input type="text" name="lastWatchedEpisode" id="lastWatchedEpisode" value="" placeholder="03x12 for example" />
+                </fieldset>
+            </div>
+
+            <a id="watched-ref" href="#" data-role="button">Submit</a>
         </div>
     </div>
     <div id="searchHitsPage" data-role="page">

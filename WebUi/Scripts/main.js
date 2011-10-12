@@ -52,7 +52,7 @@ function renderShows(availableShows, futureShows) {
     });
 }
 function initSignalR() {
-    var connection = $.connection('event');
+    var connection = $.connection('/event');
     connection.received(function (data) { //TODO: Debounce these
         if(data == "watchlist") {
             //Watchlist data changed on the server. Refresh if needed
@@ -69,25 +69,29 @@ $(document).ready(function () {
     var connection = initSignalR();
     $("#watched-ref").click(function () {
         var sourceId = $("#currentSourceId").attr("value");
-        //TODO; encode sourceId
-        $.ajax({
-            url: "/WatchList/WatchedAsync?sourceId=" + sourceId,
-            success: function () {
-                $.mobile.changePage($("#showsPage"));
-                fetchAndRenderShows();
-            }
-        });
-    });
-    $("#watched-season-ref").click(function () {
-        var sourceId = $("#currentSourceId").attr("value");
-        //TODO; encode sourceId
-        $.ajax({
-            url: "/WatchList/WatchedSeasonAsync?sourceId=" + sourceId,
-            success: function () {
-                $.mobile.changePage($("#showsPage"));
-                fetchAndRenderShows();
-            }
-        });
+        var checkedId = $("input[@name=radio-choice-watched]:checked").attr('id');
+        var url = "";
+        if (checkedId == "radio-choice-episode") {
+            url = "/WatchList/WatchedAsync?sourceId=" + sourceId;
+        } else if (checkedId == "radio-choice-season") {
+            url = "/WatchList/WatchedSeasonAsync?sourceId=" + sourceId;
+        } else if (checkedId == "radio-choice-custom") {
+            var epPattern = /(\d+)x(\d+)/;
+            var result = epPattern.exec($("#lastWatchedEpisode").val());
+            var seasonNo = parseInt(result[1], 10);
+            var episodeNo = parseInt(result[2], 10);
+            url = "/WatchList/WatchedToAsync?sourceId=" + sourceId + "&seasonNo=" + seasonNo + "&episodeNo=" + episodeNo;
+            $("#lastWatchedEpisode").val("");
+        }
+        if (url != "") {
+            $.ajax({
+                url: url,
+                success: function () {
+                    $.mobile.changePage($("#showsPage"));
+                    fetchAndRenderShows();
+                }
+            });
+        }
     });
     $("#search").submit(function () {
         searchForShow($("#partialName").val());

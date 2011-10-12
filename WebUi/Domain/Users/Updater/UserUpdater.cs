@@ -18,6 +18,39 @@ namespace AlunTv.Test.Users.Updater
             _eventSink = eventSink;
         }
 
+        public bool SetLastWatchedTo(string userName, string sourceId, int seasonNo, int episodeNo)
+        {
+            var user = _session.Load<User>(User.IdFromUserName(userName));
+
+            if (user == null || user.WatchList == null || user.WatchList.Shows == null)
+                return false;
+
+            var show = user
+                .WatchList
+                .Shows
+                .Single(x => x.SourceId.Equals(sourceId));
+
+            var source = new DbShowSource(_session);
+            var sourceShow = source.GetById(sourceId);
+            if (sourceShow == null)
+                return false;
+
+            var lastWatchedEpisode = sourceShow
+                .Episodes
+                .Where(x => x.SeasonNo == seasonNo && x.InSeasonEpisodeNo == episodeNo)
+                .SingleOrDefault();
+            if (lastWatchedEpisode == null)
+                return false;
+
+            var firstUnwatched = sourceShow.GetFirstEpisodeAfter(seasonNo, episodeNo);
+
+            show.FirstUnwatchedEpisode = Map(firstUnwatched);
+            show.LastWatchedEpisode = Map(lastWatchedEpisode);
+
+            _session.Store(user);
+
+            return true;           
+        }
 
         public bool SetSeasonWatched(string userName, string sourceId)
         {

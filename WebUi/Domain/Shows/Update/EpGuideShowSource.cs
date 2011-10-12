@@ -5,11 +5,13 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using CsvHelper;
+using NLog;
 
 namespace AlunTv.Test
 {
     public class EpGuideShowSource
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public ShowInfoCache[] FetchShowNamesFromEpGuides()
         {
             var request = WebRequest.Create("http://epguides.com/common/allshows.txt");
@@ -46,6 +48,7 @@ namespace AlunTv.Test
 
         public Show FetchShowFromEpGuide(string sourceId, ShowInfo cacheItem)
         {
+            Logger.Info("Fetching show: {0}", sourceId);
             var request = WebRequest.Create(String.Format("http://epguides.com/common/exportToCSV.asp?rage={0}", sourceId));
             var response = request.GetResponse();
             using (var r = new StreamReader(response.GetResponseStream()))

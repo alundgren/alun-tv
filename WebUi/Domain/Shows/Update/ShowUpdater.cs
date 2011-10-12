@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Raven.Client;
+using WebUi.Domain.Shows.Entities;
 
 namespace AlunTv.Test
 {
@@ -44,12 +45,32 @@ namespace AlunTv.Test
         //This set is so small that we don't really care about dates and such. Just update all of them.
         public void UpdateShowNames()
         {
+            var lastUpdateDateCount = _session
+                .Query<NameSourceUpdate>()
+                .Select(x => x.Date)
+                .Count();
+            if (lastUpdateDateCount > 0)
+            {
+                var lastUpdateDate = _session
+                    .Query<NameSourceUpdate>()
+                    .OrderByDescending(x => x.Date)
+                    .First();
+                if (lastUpdateDate.Date > DateTimeOffset.UtcNow.AddDays(-7))
+                {
+                    Logger.Info("Skipping UpdateShowNames. Last update was: {0}", lastUpdateDate);
+                    return;
+                }
+            }
+
+            Logger.Info("UpdateShowNames running");
             var source = new EpGuideShowSource();
             var caches = source.FetchShowNamesFromEpGuides();
             foreach (var cache in caches)
             {
                 _session.Store(cache);
             }
+
+            _session.Store(new NameSourceUpdate { Date = DateTimeOffset.UtcNow });
         }
 
         public void SeedShow(string sourceId)
