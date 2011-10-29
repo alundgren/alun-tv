@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AlunTv.Test;
+using AlunTv.Test.Users.Updater;
 using Autofac;
 using Autofac.Integration.Mvc;
 using MongoDB.Driver;
@@ -17,6 +18,7 @@ using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Indexes;
 using SignalR.Routing;
+using TvMvc3.Integration.CouchDb.User;
 using WebUi.Domain.Events;
 using WebUi.Models;
 using WebUi.Infrastructure;
@@ -29,6 +31,7 @@ namespace WebUi
     {
         public static IDocumentStore DocumentStore;
         public static Logger Logger = LogManager.GetCurrentClassLogger();
+        public static bool IsLocalDebug = false;
         
         private void RegisterAutoFac()
         {
@@ -53,7 +56,12 @@ namespace WebUi
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("elmah.axd");
 
-            RouteTable.Routes.MapConnection<EventConnection>("event", "event/{*operation}");
+            //RouteTable.Routes.MapConnection<EventConnection>("event", "event/{*operation}");
+
+            routes.MapRoute(
+                "Options", 
+                "WatchList/Options/{sourceId}",
+                new {controller = "WatchList", action = "Options"});
 
             routes.MapRoute(
                 "Default", // Route name
@@ -79,6 +87,7 @@ namespace WebUi
             var ravenUrl = WebConfigurationManager.AppSettings["RavenUrl"];
             if (ravenCredentials == "None")
             {
+                IsLocalDebug = true;
                 InitTestDb(ravenUrl);
             }
             else
@@ -108,13 +117,20 @@ namespace WebUi
                                 }.Initialize();
             using (var session = DocumentStore.OpenSession())
             {
-                var infoCount = session.Query<ShowInfoCache>().Count();
-                if (infoCount == 0)
+                session.Advanced.UseOptimisticConcurrency = true; //since we use count index queries there is a tiny possibility of writing twice.
+                if (session.Query<ShowInfoCache>().Count() == 0)
                 {
                     var updater = new ShowUpdater(session, x => Logger.Info("Updated names"));
                     updater.UpdateShowNames();
-                    session.SaveChanges();
                 }
+                if (session.Query<User>().Count() == 0)
+                {
+                    var users = new UserUpdater(session, _ => { });
+                    string salt;
+                    var pwHash = Passwords.Hash("123456789012", out salt);
+                    users.CreateUser("alun", pwHash, salt);
+                }
+                session.SaveChanges();
             }
         }
 

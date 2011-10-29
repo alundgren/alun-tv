@@ -12,14 +12,27 @@
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.css" />
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.signalR.min.js")"></script>
+    <script src="/signalr/hubs" type="text/javascript"></script>
     <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.js"></script>
+    <script type="text/javascript">
+//        This path is used in our js files so we can publish to a subdirectory in iis without breaking links
+        basePath = "@Url.Content("~/")";
+        $(document).ready(function() {
+            $('#showOptionsDialog').live('pageshow', function () {
+                $('#RadioChoiceCustom').focus(function () {
+                    $('input[name="RadioChoiceWatched"]').attr('checked', false);
+                    $('#radio-choice-custom').attr('checked', true);
+                    $('input[name="RadioChoiceWatched"]').checkboxradio("refresh");
+                });
+            });
+        });
+    </script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/main.js")"></script>
-
     <script type="text/x-jquery-tmpl" id="showsTemplate">
         {{each shows}}
                 <li class="show">    
-                    <a href="#showOptionsDialog" data-rel="dialog" id="show${SourceId}">
+                    <a href="@Url.Action("Options", "WatchList")/${SourceId}" data-rel="dialog" id="show${SourceId}">
                         <input type="hidden" value="${SourceId}" />
                         <h3>${ShowName} - ${FormattedEpisodeNo}</h3>
                         <p>${FormattedDate} - ${EpisodeName}</p>
@@ -60,31 +73,6 @@
                 <li data-role="list-divider" id="availableDivider">Available</li>
                 <li data-role="list-divider" id="futureDivider">Future</li>    
             </ul>
-        </div>
-    </div>
-    <div id="showOptionsDialog" data-role="page">
-        <div data-role="header">
-            <h1>Options</h1>
-        </div>
-        <div data-role="content">
-            <input type="hidden" id="currentSourceId" value=""/>
-            <a id="back-ref" href="#" data-role="button" data-rel="back">Back</a>
-            <div data-role="fieldcontain">
-                <fieldset data-role="controlgroup">
-    	            <legend>How far have you watched?</legend>
-         	            <input type="radio" name="radio-choice-watched" id="radio-choice-episode" value="choice-episode" checked="checked" />
-         	            <label for="radio-choice-episode">Current episode</label>
-
-         	            <input type="radio" name="radio-choice-watched" id="radio-choice-season" value="choice-season"  />
-         	            <label for="radio-choice-season">Current season</label>
-
-         	            <input type="radio" name="radio-choice-watched" id="radio-choice-custom" value="choice-custom"  />
-         	            <label for="radio-choice-custom">Custom</label>
-                        <input type="text" name="lastWatchedEpisode" id="lastWatchedEpisode" value="" placeholder="03x12 for example" />
-                </fieldset>
-            </div>
-
-            <a id="watched-ref" href="#" data-role="button">Submit</a>
         </div>
     </div>
     <div id="searchHitsPage" data-role="page">

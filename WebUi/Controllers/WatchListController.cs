@@ -27,6 +27,28 @@ namespace TvMvc3.Controllers
             return View();
         }
 
+        public ActionResult Options(string sourceId, IPrincipal principal)
+        {
+            var u = GetUser(principal.Identity.Name);
+            var show = u.WatchList.Shows.Single(x => x.SourceId == sourceId);
+            var fu = show.FirstUnwatchedEpisode;
+            return View(new OptionsViewModel
+                            {
+                                SourceId = show.SourceId,
+                                ShowName = show.ShowName,
+                                CurrentEpisode =
+                                    fu == null 
+                                    ? ""
+                                    : string.Format("{0:00}x{1:00}", fu.SeasonNo, fu.InSeasonEpisodeNo)
+                            });
+        }
+
+        [HttpPost]
+        public ActionResult Options(OptionsViewModel model, IPrincipal principal)
+        {
+            return View();
+        }
+
         private bool UpdateWatched(string sourceId, IPrincipal principal)
         {
             return (new UserUpdater(DocumentSession, _ => { })).SetEpisodeWatched(principal.Identity.Name, sourceId);       
@@ -60,8 +82,8 @@ namespace TvMvc3.Controllers
 
         private User GetUser(string userName)
         {
-            return
-                DocumentSession.Load<User>(TvMvc3.Integration.CouchDb.User.User.IdFromUserName(userName));
+            var ur = new UserRepository(DocumentSession);
+            return ur.GetUser(userName);
         }
 
         private WatchListViewModel GetWatchList(IPrincipal principal)

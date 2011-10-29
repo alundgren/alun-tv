@@ -22,7 +22,6 @@ function renderSearchHits(data) {
             url: "/Show/AddAsync?sourceId=" + sourceId,
             success: function () {
                 $.mobile.changePage($("#showsPage"));
-                fetchAndRenderShows();
             }
         });
     });
@@ -52,18 +51,15 @@ function renderShows(availableShows, futureShows) {
     });
 }
 function initSignalR() {
-    var connection = $.connection('/event');
-    connection.received(function (data) { //TODO: Debounce these
-        if(data == "watchlist") {
-            //Watchlist data changed on the server. Refresh if needed
-            if($.mobile.activePage[0].id == "showsPage") {
-                fetchAndRenderShows();
-            }
+    var myConnection = $.connection.eventHub;
+    myConnection.watchListChanged = function () {
+        //Watchlist data changed on the server. Refresh if needed
+        if ($.mobile.activePage[0].id == "showsPage") {
+            fetchAndRenderShows();
         }
-        fetchAndRenderShows();
-    });
-    connection.start();
-    return connection;
+    };
+    $.connection.hub.start();
+    return myConnection;
 }
 $(document).ready(function () {
     var connection = initSignalR();
@@ -97,8 +93,6 @@ $(document).ready(function () {
         searchForShow($("#partialName").val());
         return false;
     });
-
-
 
     fetchAndRenderShows();
 });

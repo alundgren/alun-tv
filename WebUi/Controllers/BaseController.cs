@@ -9,6 +9,7 @@ using AlunTv.Test.Users.Updater;
 using Raven.Client;
 using Raven.Client.Document;
 using SignalR;
+using SignalR.Hubs;
 using WebUi.Domain.Events;
 
 namespace WebUi.Controllers
@@ -17,15 +18,16 @@ namespace WebUi.Controllers
     {
         protected IDocumentSession DocumentSession;
 
-        protected void StartBackgroundSignallingTask(Action<IDocumentSession, IConnection> task)
+        protected void StartBackgroundSignallingTask(Action<IDocumentSession, Action<string>> task)
         {
             ThreadPool.QueueUserWorkItem(__ =>
             {
                 //Need a new session to avoid a race condition with the controller
                 using (var session = MvcApplication.DocumentStore.OpenSession())
                 {
-                    var conn = Connection.GetConnection<EventConnection>();
-                    task(session, conn);
+                    session.Advanced.UseOptimisticConcurrency = true;
+                    Action<string> signal = s => Hub.GetClients<EventHub>().watchListChanged();
+                    task(session, signal);
                     session.SaveChanges();
                 }
             });
@@ -34,6 +36,7 @@ namespace WebUi.Controllers
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             DocumentSession = MvcApplication.DocumentStore.OpenSession();
+            DocumentSession.Advanced.UseOptimisticConcurrency = true;
         }
 
         protected override void OnActionExecuted(ActionExecutedContext filterContext)

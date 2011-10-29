@@ -8,6 +8,7 @@ using System.Security.Principal;
 using AlunTv.Test;
 using AlunTv.Test.Users.Updater;
 using SignalR;
+using SignalR.Hubs;
 using WebUi.Domain.Events;
 
 
@@ -19,9 +20,9 @@ namespace WebUi.Controllers
         public ActionResult AddAsync(string sourceId, IPrincipal principal)
         {
             StartBackgroundSignallingTask(
-                (session, conn) =>
+                (session, signal) =>
                 {
-                    var u = new UserUpdater(session, s => conn.Broadcast(s));
+                    var u = new UserUpdater(session, signal);
                     u.AddShow(principal.Identity.Name, sourceId);
                 });
 

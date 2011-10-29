@@ -147,6 +147,7 @@
     <Compile Include="Controllers\ShowController.cs" />
     <Compile Include="Controllers\WatchListController.cs" />
     <Compile Include="Domain\Events\EventConnection.cs" />
+    <Compile Include="Domain\Events\EventHub.cs" />
     <Compile Include="Domain\Shows\Entities\Episode.cs" />
     <Compile Include="Domain\Shows\Entities\NameSourceUpdate.cs" />
     <Compile Include="Domain\Shows\Entities\Show.cs" />
@@ -170,17 +171,18 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\DiagnosticsTraceLogger.cs" />
+    <Compile Include="Infrastructure\Passwords.cs" />
     <Compile Include="Infrastructure\PrincipalModelBinder.cs" />
     <Compile Include="Infrastructure\SessionExtensions.cs" />
     <Compile Include="Infrastructure\SqlTraceWriterListener.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Models\LogonViewModel.cs" />
+    <Compile Include="Models\OptionsViewModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\WatchListEntryViewModel.cs" />
     <Compile Include="Models\WatchListViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Scripts\disable_ajaxlinks.js" />
-    <Content Include="Scripts\jquery.signalR.js" />
     <Content Include="Scripts\jquery.signalR.min.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
@@ -224,6 +226,9 @@
       <Project>{03444C18-99A3-4A2E-8E3F-C9EA562FDF9B}</Project>
       <Name>TvRage</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\WatchList\Options.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
