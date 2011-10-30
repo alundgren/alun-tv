@@ -46,40 +46,27 @@ namespace TvMvc3.Controllers
         [HttpPost]
         public ActionResult Options(OptionsViewModel model, IPrincipal principal)
         {
-            return View();
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var u = new UserUpdater(DocumentSession, _ => { });
+            if (model.RadioChoiceWatched == "choice-episode")
+            {
+                u.SetEpisodeWatched(principal.Identity.Name, model.SourceId);
+            }
+            if (model.RadioChoiceWatched == "choice-season")
+            {
+                u.SetSeasonWatched(principal.Identity.Name, model.SourceId);
+            }
+            if (model.RadioChoiceWatched == "choice-custom")
+            {
+                var foo = model.RadioChoiceCustom.ToLower().Split('x');
+                u.SetLastWatchedTo(principal.Identity.Name, model.SourceId, int.Parse(foo[0]), int.Parse(foo[1]));
+            }
+            return View("Index");
         }
-
-        private bool UpdateWatched(string sourceId, IPrincipal principal)
-        {
-            return (new UserUpdater(DocumentSession, _ => { })).SetEpisodeWatched(principal.Identity.Name, sourceId);       
-        }
-
-        private bool UpdateWatchedSeason(string sourceId, IPrincipal principal)
-        {
-            return (new UserUpdater(DocumentSession, _ => { })).SetSeasonWatched(principal.Identity.Name, sourceId);
-        }
-
-        private bool UpdateLastWatchedTo(string sourceId, int seasonNo, int episodeNo, IPrincipal principal)
-        {
-            return (new UserUpdater(DocumentSession, _ => { })).SetLastWatchedTo(principal.Identity.Name, sourceId, seasonNo, episodeNo);
-        }
-
-        public ActionResult WatchedAsync(string sourceId, IPrincipal principal)
-        {
-            return Json(UpdateWatched(sourceId, principal) ? "ok" : "fail", JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult WatchedSeasonAsync(string sourceId, IPrincipal principal)
-        {
-            return  Json(UpdateWatchedSeason(sourceId, principal) ? "ok" : "fail", 
-                JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult WatchedToAsync(string sourceId, int seasonNo, int episodeno, IPrincipal principal)
-        {
-            return Json(UpdateLastWatchedTo(sourceId, seasonNo, episodeno, principal) ? "ok" : "fail", JsonRequestBehavior.AllowGet);
-        }
-
+       
         private User GetUser(string userName)
         {
             var ur = new UserRepository(DocumentSession);

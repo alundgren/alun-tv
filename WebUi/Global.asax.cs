@@ -117,11 +117,11 @@ namespace WebUi
                                 }.Initialize();
             using (var session = DocumentStore.OpenSession())
             {
-                session.Advanced.UseOptimisticConcurrency = true; //since we use count index queries there is a tiny possibility of writing twice.
                 if (session.Query<ShowInfoCache>().Count() == 0)
                 {
                     var updater = new ShowUpdater(session, x => Logger.Info("Updated names"));
                     updater.UpdateShowNames();
+                    session.SaveChanges();
                 }
                 if (session.Query<User>().Count() == 0)
                 {
@@ -129,8 +129,9 @@ namespace WebUi
                     string salt;
                     var pwHash = Passwords.Hash("123456789012", out salt);
                     users.CreateUser("alun", pwHash, salt);
+                    session.SaveChanges();
                 }
-                session.SaveChanges();
+                
             }
         }
 

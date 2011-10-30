@@ -26,6 +26,9 @@
                     $('input[name="RadioChoiceWatched"]').checkboxradio("refresh");
                 });
             });
+            $('#showsPage').live('pageshow', function () {
+                fetchAndRenderShows();
+            });            
         });
     </script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/main.js")"></script>
