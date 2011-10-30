@@ -28,7 +28,8 @@
             });
             $('#showsPage').live('pageshow', function () {
                 fetchAndRenderShows();
-            });            
+            });
+            fetchAndRenderShows(); /* The framework is retarded an doesnt trigger a pageshow initially */
         });
     </script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/main.js")"></script>
